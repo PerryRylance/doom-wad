@@ -23,7 +23,7 @@ export default class Writer
 			result += 0x10;
 
 			// NB: Add the payload of the lump
-			result += lump.content.byteLength;
+			result += lump.length;
 		}
 
 		return result;
@@ -44,12 +44,12 @@ export default class Writer
 		this.cursor++;
 	}
 
-	private writeUint32(value: number): void
+	private writeInt32(value: number): void
 	{
-		if(value < 0 || value > 0xFFFFFFFF)
+		if(value < 0 || value > 0x7FFFFFFF)
 			throw new RangeError(`Invalid 32-bit value ${value}`);
 		
-		this.view.setUint32(this.cursor, value, true);
+		this.view.setInt32(this.cursor, value, true);
 
 		this.cursor += 4;
 	}
@@ -82,23 +82,26 @@ export default class Writer
 			this.writeUint8(0);
 	}
 
-	private writeHeader(): void
-	{
-		this.writeString(this.wad.type);
-		this.writeUint32(this.wad.lumps.length);
-
-		// NB: Add four bytes to account for the dictionary size 32-bit uint itself
-		console.log("Calculated dictionary offset is " + (this.cursor + 4 + this.wad.lumpsTotalByteLength));
-		this.writeUint32(this.cursor + 4 + this.wad.lumpsTotalByteLength);
-	}
-
 	private writeArrayBuffer(data: ArrayBuffer)
 	{
+		if(data.byteLength == 0)
+			return;
+
 		const view = new Uint8Array(this.output, 0, this.output.byteLength);
 
 		view.set(new Uint8Array(data), this.cursor);
 
 		this.cursor += data.byteLength;
+	}
+
+	private writeHeader(): void
+	{
+		this.writeString(this.wad.type);
+		this.writeInt32(this.wad.lumps.length);
+
+		// NB: Add four bytes to account for the dictionary size 32-bit uint itself
+		console.log("Calculated dictionary offset is " + (this.cursor + 4 + this.wad.lumpsTotalByteLength));
+		this.writeInt32(this.cursor + 4 + this.wad.lumpsTotalByteLength);
 	}
 
 	private writeLumpsAndDictionary(): void
@@ -109,6 +112,9 @@ export default class Writer
 		{
 			lumpPositions.push(this.cursor);
 
+			if(lump.content.byteLength == 0)
+				continue;
+
 			this.writeArrayBuffer(lump.content);
 		}
 
@@ -117,9 +123,15 @@ export default class Writer
 
 		for(const lump of this.wad.lumps)
 		{
-			this.writeUint32(lumpPositions[index++]);
-			this.writeUint32(lump.content.byteLength);
+			if(lump.content.byteLength > 0)
+				this.writeInt32(lumpPositions[index]);
+			else
+				this.writeInt32(0); // NB: "Virtual" lumps (such as F_START) only exist in the directory, having a size of 0. Their offset value therefore is nonsensical (often 0).
+			
+			this.writeInt32(lump.content.byteLength);
 			this.writePaddedString(lump.name, 8);
+
+			index++;
 		}
 	}
 

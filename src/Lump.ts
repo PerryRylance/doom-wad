@@ -24,4 +24,9 @@ export default class Lump
 
 		this._name = value + Array( 8 - value.length + 1 ).join("\x00");
 	}
+
+	get length(): number
+	{
+		return this.content.byteLength; // NB: Add terminator
+	}
 }

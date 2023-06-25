@@ -128,3 +128,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Kept stopping me pushing, need to adjust this somehow, or write tests to download it
+tests/freedoom1.wad

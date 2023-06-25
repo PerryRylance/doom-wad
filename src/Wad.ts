@@ -16,7 +16,7 @@ export default class Wad
 	{
 		let result = 0;
 
-		this.lumps.forEach(lump => { result += lump.content.byteLength; });
+		this.lumps.forEach(lump => { result += lump.length; });
 
 		return result;
 	}

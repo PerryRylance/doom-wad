@@ -1,7 +1,7 @@
 import ParseError from "../src/ParseError";
 import Wad, { WadType } from "../src/Wad";
 
-const TEST_WAD_FILENAME = "./tests/freedoom1.wad";
+const TEST_WAD_FILENAME = "./tests/test.wad";
 
 function getTestWadFilesize(): number
 {
@@ -41,9 +41,9 @@ function loadInvalidWad(): void
 
 const wad = loadTestWad();
 
-test("Reads WAD type correctly",	() => expect(wad.type).toBe(WadType.IWAD));
+test("Reads WAD type correctly",	() => expect(wad.type).toBe(WadType.PWAD));
 test("Throws on empty file",		() => expect(loadEmptyFile).toThrow(ParseError));
 test("Throws on invalid WAD type",	() => expect(loadInvalidWad).toThrow(ParseError));
-test("Has 3,081 lumps",				() => expect(wad.lumps.length).toBe(3081));
+test("Has 63 lumps",				() => expect(wad.lumps.length).toBe(63));
 
 test("Output filesize to be equal",	() => expect(wad.save().byteLength).toBe(getTestWadFilesize()));

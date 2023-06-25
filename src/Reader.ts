@@ -39,9 +39,9 @@ export default class Reader
 		return result;
 	}
 
-	private readUint32()
+	private readInt32()
 	{
-		const result: number = this.view.getUint32(this.cursor, true);
+		const result: number = this.view.getInt32(this.cursor, true);
 
 		this.cursor += 4;
 
@@ -69,8 +69,8 @@ export default class Reader
 			throw new ParseError("Invalid type in WAD header");
 		
 		this.wad.type			= type;
-		this.numLumps			= this.readUint32();
-		this.dictionaryOffset	= this.readUint32();
+		this.numLumps			= this.readInt32();
+		this.dictionaryOffset	= this.readInt32();
 	}
 
 	private readDictionaryAndLumps(): void
@@ -83,8 +83,8 @@ export default class Reader
 		
 		for(let i = 0; i < this.numLumps; i++)
 		{
-			let position	= this.readUint32();
-			let length		= this.readUint32();
+			let position	= this.readInt32();
+			let length		= this.readInt32();
 
 			totalLength += length;
 
@@ -92,6 +92,8 @@ export default class Reader
 
 			lump.name		= this.readString(8);
 			lump.content	= this.input.slice(position, position + length);
+
+			console.log(`Read lump ${lump.name} will be at position ${position} with length ${length}`);
 
 			lumps.push(lump);
 		}
