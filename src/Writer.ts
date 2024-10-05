@@ -96,24 +96,36 @@ export default class Writer
 
 	private writeHeader(): void
 	{
+		console.debug(`Writing WAD type ${this.wad.type} at ${this.cursor.toString(16)}`);
+
 		this.writeString(this.wad.type);
+
+		console.debug(`Writing count of ${this.wad.lumps.length} at ${this.cursor.toString(16)}`);
+
 		this.writeInt32(this.wad.lumps.length);
 
 		// NB: Add four bytes to account for the dictionary size 32-bit uint itself
-		console.log("Calculated dictionary offset is " + (this.cursor + 4 + this.wad.lumpsTotalByteLength));
+		console.debug("Writing calculated dictionary offset 0x" + (this.cursor + 4 + this.wad.lumpsTotalByteLength).toString(16) + " at 0x" + this.cursor.toString(16));
+
 		this.writeInt32(this.cursor + 4 + this.wad.lumpsTotalByteLength);
 	}
 
 	private writeLumpsAndDictionary(): void
 	{
 		const lumpPositions: number[] = [];
+		let count = 1;
 
 		for(const lump of this.wad.lumps)
 		{
+			console.debug(`Writing lump ${count} / ${this.wad.lumps.length} at 0x${this.cursor.toString(16)}`);
+			count++;
+
 			lumpPositions.push(this.cursor);
 
 			if(lump.content.byteLength == 0)
 				continue;
+
+			console.debug(`Writing ${lump.content.byteLength} bytes of lump content at 0x${this.cursor.toString(16)}`);
 
 			this.writeArrayBuffer(lump.content);
 		}
@@ -123,10 +135,8 @@ export default class Writer
 
 		for(const lump of this.wad.lumps)
 		{
-			if(lump.content.byteLength > 0)
-				this.writeInt32(lumpPositions[index]);
-			else
-				this.writeInt32(0); // NB: "Virtual" lumps (such as F_START) only exist in the directory, having a size of 0. Their offset value therefore is nonsensical (often 0).
+			// NB: Somewhere I read that virtual lumps (such as F_START) only exist in the dictionary, having a size of 0 and that therefore offset value is nonsensical and often 0, however, I found Slade does preserve these offsets - we mirror this behaviour and write the position.
+			this.writeInt32(lumpPositions[index]);
 			
 			this.writeInt32(lump.content.byteLength);
 			this.writePaddedString(lump.name, 8);
@@ -143,10 +153,5 @@ export default class Writer
 		this.rewind();
 		this.writeHeader();
 		this.writeLumpsAndDictionary();
-		
-		// TODO: Remove temporary code
-		const { writeFileSync } = require("fs");
-		writeFileSync("./temp.wad", this.view);
-
 	}
 }

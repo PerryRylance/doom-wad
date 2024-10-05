@@ -29,4 +29,9 @@ export default class Lump
 	{
 		return this.content.byteLength; // NB: Add terminator
 	}
+
+	load(buffer: ArrayBuffer)
+	{
+		this.content = buffer;
+	}
 }

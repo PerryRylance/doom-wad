@@ -1,4 +1,4 @@
-import Lump from "./Lump";
+import Lump from "./Lumps/Lump";
 import Reader from "./Reader";
 import Writer from "./Writer";
 

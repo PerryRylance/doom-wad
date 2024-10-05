@@ -1,6 +1,7 @@
 import Wad, { WadType } from "./Wad";
-import ParseError from "./ParseError";
-import Lump from "./Lump";
+import ParseError from "./Exceptions/ParseError";
+import Lump from "./Lumps/Lump";
+import LumpFactory from "./Lumps/LumpFactory";
 
 export default class Reader
 {
@@ -91,10 +92,10 @@ export default class Reader
 
 			totalLength += length;
 
-			let lump		= new Lump();
+			let name		= this.readString(8);
+			let lump		= LumpFactory.createFromName(name);
 
-			lump.name		= this.readString(8);
-			lump.content	= this.input.slice(position, position + length);
+			lump.load(this.input.slice(position, position + length));
 
 			console.log(`Read lump ${lump.name} will be at position 0x${position.toString(16)} with length 0x${length.toString(16)}`);
 
