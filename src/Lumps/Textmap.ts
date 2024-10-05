@@ -62,16 +62,20 @@ interface AssignmentExpression
 	value: boolean | number | string;
 }
 
-interface BlockExpression
+type Properties = Record<string, boolean | number | string>;
+
+type BlockType = "thing" | "vertex" | "linedef" | "sidedef" | "sector";
+
+interface Block
 {
-	type: "thing" | "vertex" | "linedef" | "sidedef" | "sector";
-	assignments: AssignmentExpression[];
+	type: BlockType;
+	properties: Properties;
 }
 
 export default class Textmap extends Lump
 {
-	namespace?: AssignmentExpression;
-	blocks: BlockExpression[] = [];
+	namespace?: string;
+	blocks: Block[] = [];
 
 	private tokenize(string: string)
 	{
@@ -89,7 +93,7 @@ export default class Textmap extends Lump
 			ctx.accept("float", parseFloat(match[0]))
 		});
 
-		[/[+-]?[1-9]+[0-9]*/, /0[0-9]+/, /0x[0-9A-Fa-f]+/].forEach(regex => 
+		[/[+-]?[0-9]+/, /0[0-9]+/, /0x[0-9A-Fa-f]+/].forEach(regex => 
 			lexer.rule(regex, (ctx, match) => {
 				ctx.accept("integer", parseInt(match[0]))
 			})
@@ -156,7 +160,7 @@ export default class Textmap extends Lump
 		};
 	}
 
-	private parseBlock(next: () => Token, peek: () => Token): BlockExpression
+	private parseBlock(next: () => Token, peek: () => Token): Block
 	{
 		const first = next();
 
@@ -183,10 +187,13 @@ export default class Textmap extends Lump
 		if(open.type !== "open-brace")
 			throw new ParseTextmapError("Expected open brace");
 
-		const assignments: AssignmentExpression[] = [];
+		const properties: Properties = {};
 
 		while(peek().type !== "close-brace")
-			assignments.push(this.parseAssignment(next));
+		{
+			const expression = this.parseAssignment(next);
+			properties[expression.name] = expression.value;
+		}
 
 		const closed = next();
 
@@ -195,7 +202,7 @@ export default class Textmap extends Lump
 
 		return {
 			type,
-			assignments
+			properties
 		};
 	}
 
@@ -221,7 +228,7 @@ export default class Textmap extends Lump
 		const first = tokens[0];
 
 		if(first.type === "identifier" && first.value === "namespace")
-			this.namespace = this.parseAssignment(next);
+			this.namespace = this.parseAssignment(next).value.toString();
 
 		while(cursor < tokens.length && peek().type !== "EOF")
 			this.blocks.push( this.parseBlock(next, peek) );
@@ -238,7 +245,42 @@ export default class Textmap extends Lump
 		const tokens = this.tokenize(string);
 
 		this.parse(tokens as Token[]);
+	}
 
-		console.log("ok");
+	get content(): ArrayBuffer
+	{
+		const lines: string[] = [];
+		const escape = (string: string) => string.replace("\"", "\\\"");
+
+		if(this.namespace)
+			lines.push(`namespace = "${escape(this.namespace)}";`);
+
+		this.blocks.forEach(block => {
+
+			lines.push(block.type);
+			lines.push("{");
+
+			for(const key in block.properties)
+			{
+				const value = block.properties[key];
+				let stringified;
+
+				if(value === true)
+					stringified = "true";
+				else if(value === false)
+					stringified = "false";
+				else if(typeof value === "number")
+					stringified = value.toString();
+				else if(typeof value === "string")
+					stringified = `"${escape(value)}"`;
+
+				lines.push(`${key} = ${stringified};`);
+			}
+
+			lines.push("}");
+
+		});
+
+		return new TextEncoder().encode(lines.join("\n"));
 	}
 }

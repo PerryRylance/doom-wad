@@ -1,7 +1,7 @@
 export default class Lump
 {
 	private _name: string;
-	content: ArrayBuffer;
+	private _content: ArrayBuffer;
 
 	get name(): string
 	{
@@ -25,6 +25,11 @@ export default class Lump
 		this._name = value + Array( 8 - value.length + 1 ).join("\x00");
 	}
 
+	get content(): ArrayBuffer
+	{
+		return this._content;
+	}
+
 	get length(): number
 	{
 		return this.content.byteLength; // NB: Add terminator
@@ -32,6 +37,6 @@ export default class Lump
 
 	load(buffer: ArrayBuffer)
 	{
-		this.content = buffer;
+		this._content = buffer;
 	}
 }

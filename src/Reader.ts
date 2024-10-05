@@ -97,7 +97,7 @@ export default class Reader
 
 			lump.load(this.input.slice(position, position + length));
 
-			console.log(`Read lump ${lump.name} will be at position 0x${position.toString(16)} with length 0x${length.toString(16)}`);
+			console.debug(`Read lump ${lump.name} will be at position 0x${position.toString(16)} with length 0x${length.toString(16)}`);
 
 			lumps.push(lump);
 		}

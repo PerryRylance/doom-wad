@@ -1,3 +1,5 @@
+import { writeFileSync } from "fs";
+
 import Textmap from "../src/Lumps/Textmap";
 import Wad from "../src/Wad";
 
@@ -18,6 +20,12 @@ function loadTestWad(): Wad
 const wad = loadTestWad();
 const textmap = wad.lumps.find(lump => lump instanceof Textmap);
 
-test("WAD contains TEXTMAP lump", () => expect(textmap).not.toBeUndefined());
+test("WAD parses TEXTMAP lump", () => expect(textmap).not.toBeUndefined());
 
-// test("Parses namespace correctly", () => )
+let tag = 1;
+
+textmap?.blocks
+	.filter(block => block.type === "sector" && "id" in block.properties && block.properties.id === 1)
+	.forEach(block => block.properties.id = tag++);
+
+writeFileSync("experiment.wad", new DataView(wad.save()));

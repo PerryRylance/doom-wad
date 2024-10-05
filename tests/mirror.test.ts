@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 import { readFileSync } from "fs";
 
-import ParseError from "../src/ParseError";
+import ParseError from "../src/Exceptions/ParseError";
 import Wad, { WadType } from "../src/Wad";
 
 const TEST_WAD_FILENAME = "./tests/saved-through-slade.wad";
