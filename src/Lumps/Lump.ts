@@ -1,7 +1,7 @@
 export default class Lump
 {
-	private _name: string;
-	private _content: ArrayBuffer;
+	private _name: string = "";
+	private _content: ArrayBuffer = new ArrayBuffer(0);
 
 	get name(): string
 	{

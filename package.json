@@ -3,6 +3,8 @@
 	"version": "1.0.0",
 	"license": "MIT",
 	"description": "An extensible TypeScript library for working with DOOM WAD files, includes TEXTMAP parser",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
 	"private": false,
 	"publishConfig": {
 		"access": "public"

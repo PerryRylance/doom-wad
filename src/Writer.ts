@@ -3,10 +3,10 @@ import Wad from "./Wad";
 export default class Writer
 {
 	private wad: Wad;
-	private output: ArrayBuffer;
-	private view: DataView;
 
-	private cursor: number;
+	private output?: ArrayBuffer;
+	private view?: DataView;
+	private cursor?: number;
 
 	constructor(wad: Wad)
 	{
@@ -39,9 +39,9 @@ export default class Writer
 		if(value < 0 || value > 0xFF)
 			throw new RangeError(`Invalid byte value ${value}`);
 		
-		this.view.setUint8(this.cursor, value);
+		this.view!.setUint8(this.cursor!, value);
 
-		this.cursor++;
+		this.cursor!++;
 	}
 
 	private writeInt32(value: number): void
@@ -49,9 +49,9 @@ export default class Writer
 		if(value < 0 || value > 0x7FFFFFFF)
 			throw new RangeError(`Invalid 32-bit value ${value}`);
 		
-		this.view.setInt32(this.cursor, value, true);
+		this.view!.setInt32(this.cursor!, value, true);
 
-		this.cursor += 4;
+		this.cursor! += 4;
 	}
 
 	private writeString(string: string): void
@@ -87,11 +87,11 @@ export default class Writer
 		if(data.byteLength == 0)
 			return;
 
-		const view = new Uint8Array(this.output, 0, this.output.byteLength);
+		const view = new Uint8Array(this.output!, 0, this.output!.byteLength);
 
 		view.set(new Uint8Array(data), this.cursor);
 
-		this.cursor += data.byteLength;
+		this.cursor! += data.byteLength;
 	}
 
 	private writeHeader(): void
@@ -107,7 +107,7 @@ export default class Writer
 		// NB: Add four bytes to account for the dictionary size 32-bit uint itself
 		// console.debug("Writing calculated dictionary offset 0x" + (this.cursor + 4 + this.wad.lumpsTotalByteLength).toString(16) + " at 0x" + this.cursor.toString(16));
 
-		this.writeInt32(this.cursor + 4 + this.wad.lumpsTotalByteLength);
+		this.writeInt32(this.cursor! + 4 + this.wad.lumpsTotalByteLength);
 	}
 
 	private writeLumpsAndDictionary(): void
@@ -120,7 +120,7 @@ export default class Writer
 			// console.debug(`Writing lump ${count} / ${this.wad.lumps.length} at 0x${this.cursor.toString(16)}`);
 			count++;
 
-			lumpPositions.push(this.cursor);
+			lumpPositions.push(this.cursor!);
 
 			if(lump.content.byteLength == 0)
 				continue;

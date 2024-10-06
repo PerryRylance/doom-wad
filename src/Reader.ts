@@ -5,13 +5,13 @@ import LumpFactory from "./Lumps/LumpFactory";
 
 export default class Reader
 {
-	private input: ArrayBuffer;
 	private wad: Wad;
-	private view: DataView;
+	private input?: ArrayBuffer;
+	private view?: DataView;
 
-	private cursor: number;
-	private numLumps: number;
-	private dictionaryOffset: number;
+	private cursor?: number;
+	private numLumps?: number;
+	private dictionaryOffset?: number;
 
 	constructor(wad: Wad)
 	{
@@ -25,7 +25,7 @@ export default class Reader
 
 	private seek(to: number): void
 	{
-		if(to < 0 || to >= this.view.byteLength)
+		if(to < 0 || to >= this.view!.byteLength)
 			throw new RangeError("Attempted to seek out of range");
 		
 		this.cursor = to;
@@ -33,18 +33,18 @@ export default class Reader
 
 	private readUint8(): number
 	{
-		const result: number = this.view.getUint8(this.cursor);
+		const result: number = this.view!.getUint8(this.cursor!);
 
-		this.cursor++;
+		this.cursor!++;
 
 		return result;
 	}
 
 	private readInt32()
 	{
-		const result: number = this.view.getInt32(this.cursor, true);
+		const result: number = this.view!.getInt32(this.cursor!, true);
 
-		this.cursor += 4;
+		this.cursor! += 4;
 
 		return result;
 	}
@@ -81,11 +81,11 @@ export default class Reader
 	{
 		const lumps: Lump[] = [];
 
-		this.seek(this.dictionaryOffset);
+		this.seek(this.dictionaryOffset!);
 
 		let totalLength = 0;
 		
-		for(let i = 0; i < this.numLumps; i++)
+		for(let i = 0; i < this.numLumps!; i++)
 		{
 			let position	= this.readInt32();
 			let length		= this.readInt32();
@@ -95,7 +95,7 @@ export default class Reader
 			let name		= this.readString(8);
 			let lump		= LumpFactory.createFromName(name);
 
-			lump.content = this.input.slice(position, position + length);
+			lump.content = this.input!.slice(position, position + length);
 
 			// console.debug(`Read lump ${lump.name} will be at position 0x${position.toString(16)} with length 0x${length.toString(16)}`);
 

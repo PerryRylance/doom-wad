@@ -9,8 +9,8 @@ export enum WadType {
 
 export default class Wad
 {
-	type: WadType;
-	lumps: Lump[];
+	type: WadType = WadType.PWAD;
+	lumps: Lump[] = [];
 
 	get lumpsTotalByteLength(): number
 	{
