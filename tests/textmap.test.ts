@@ -3,7 +3,7 @@ import { writeFileSync } from "fs";
 import Textmap from "../src/Lumps/Textmap";
 import Wad from "../src/Wad";
 
-const TEST_WAD_FILENAME = "./tests/udmf.wad";
+const TEST_WAD_FILENAME = "./tests/wads/udmf.wad";
 
 function loadTestWad(): Wad
 {
@@ -18,14 +18,5 @@ function loadTestWad(): Wad
 }
 
 const wad = loadTestWad();
-const textmap = wad.lumps.find(lump => lump instanceof Textmap);
 
-test("WAD parses TEXTMAP lump", () => expect(textmap).not.toBeUndefined());
-
-let tag = 1;
-
-textmap?.blocks
-	.filter(block => block.type === "sector" && "id" in block.properties && block.properties.id === 1)
-	.forEach(block => block.properties.id = tag++);
-
-writeFileSync("experiment.wad", new DataView(wad.save()));
+test("WAD parses TEXTMAP lump", () => expect(wad.lumps.find(lump => lump instanceof Textmap)).not.toBeUndefined());

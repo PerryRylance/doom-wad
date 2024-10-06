@@ -3,23 +3,28 @@ import Textmap from "./Textmap";
 
 export default class LumpFactory
 {
+	private static classesByName: Record<string, typeof Lump> = {};
+
+	static registerClassForName(name: string, constructor: typeof Lump)
+	{
+		LumpFactory.classesByName[name.toUpperCase()] = constructor;
+	}
+
 	static createFromName(name: string)
 	{
 		let result: Lump;
 
-		switch(name.replace(/\0.*$/g,''))
-		{
-			case "TEXTMAP":
-				result = new Textmap();
-				break;
+		const trimmed = name.replace(/\0.*$/g,'').toUpperCase();
 
-			default:
-				result = new Lump();
-				break;
-		}
+		if(!(trimmed in LumpFactory.classesByName))
+			result = new Lump();
+		else
+			result = new LumpFactory.classesByName[trimmed]();
 
 		result.name = name;
 
 		return result;
 	}
 }
+
+LumpFactory.registerClassForName("TEXTMAP", Textmap);

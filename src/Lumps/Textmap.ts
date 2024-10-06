@@ -234,12 +234,12 @@ export default class Textmap extends Lump
 			this.blocks.push( this.parseBlock(next, peek) );
 	}
 
-	load(buffer: ArrayBuffer)
+	set content(buffer: ArrayBuffer)
 	{
 		delete this.namespace;
 		this.blocks = [];
 
-		super.load(buffer);
+		super.content = buffer;
 
 		const string = new TextDecoder().decode(buffer);
 		const tokens = this.tokenize(string);

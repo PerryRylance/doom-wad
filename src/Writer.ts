@@ -96,16 +96,16 @@ export default class Writer
 
 	private writeHeader(): void
 	{
-		console.debug(`Writing WAD type ${this.wad.type} at ${this.cursor.toString(16)}`);
+		// console.debug(`Writing WAD type ${this.wad.type} at ${this.cursor.toString(16)}`);
 
 		this.writeString(this.wad.type);
 
-		console.debug(`Writing count of ${this.wad.lumps.length} at ${this.cursor.toString(16)}`);
+		// console.debug(`Writing count of ${this.wad.lumps.length} at ${this.cursor.toString(16)}`);
 
 		this.writeInt32(this.wad.lumps.length);
 
 		// NB: Add four bytes to account for the dictionary size 32-bit uint itself
-		console.debug("Writing calculated dictionary offset 0x" + (this.cursor + 4 + this.wad.lumpsTotalByteLength).toString(16) + " at 0x" + this.cursor.toString(16));
+		// console.debug("Writing calculated dictionary offset 0x" + (this.cursor + 4 + this.wad.lumpsTotalByteLength).toString(16) + " at 0x" + this.cursor.toString(16));
 
 		this.writeInt32(this.cursor + 4 + this.wad.lumpsTotalByteLength);
 	}
@@ -117,7 +117,7 @@ export default class Writer
 
 		for(const lump of this.wad.lumps)
 		{
-			console.debug(`Writing lump ${count} / ${this.wad.lumps.length} at 0x${this.cursor.toString(16)}`);
+			// console.debug(`Writing lump ${count} / ${this.wad.lumps.length} at 0x${this.cursor.toString(16)}`);
 			count++;
 
 			lumpPositions.push(this.cursor);
@@ -125,7 +125,7 @@ export default class Writer
 			if(lump.content.byteLength == 0)
 				continue;
 
-			console.debug(`Writing ${lump.content.byteLength} bytes of lump content at 0x${this.cursor.toString(16)}`);
+			// console.debug(`Writing ${lump.content.byteLength} bytes of lump content at 0x${this.cursor.toString(16)}`);
 
 			this.writeArrayBuffer(lump.content);
 		}

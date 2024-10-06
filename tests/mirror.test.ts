@@ -4,7 +4,7 @@ import { readFileSync } from "fs";
 import ParseError from "../src/Exceptions/ParseError";
 import Wad, { WadType } from "../src/Wad";
 
-const TEST_WAD_FILENAME = "./tests/saved-through-slade.wad";
+const TEST_WAD_FILENAME = "./tests/wads/saved-through-slade.wad";
 
 function getTestWadFilesize(): number
 {

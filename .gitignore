@@ -132,4 +132,5 @@ dist
 # Kept stopping me pushing, need to adjust this somehow, or write tests to download it
 tests/freedoom1.wad
 
-temp.wad
+./*.wad*
+./*.dbs

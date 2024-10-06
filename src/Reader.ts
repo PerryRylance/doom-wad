@@ -74,7 +74,7 @@ export default class Reader
 		this.numLumps			= this.readInt32();
 		this.dictionaryOffset	= this.readInt32();
 
-		console.debug(`Read WAD type ${type} with ${this.numLumps} lumps, dictionary offset at 0x${this.dictionaryOffset.toString(16)}`);
+		// console.debug(`Read WAD type ${type} with ${this.numLumps} lumps, dictionary offset at 0x${this.dictionaryOffset.toString(16)}`);
 	}
 
 	private readDictionaryAndLumps(): void
@@ -95,20 +95,20 @@ export default class Reader
 			let name		= this.readString(8);
 			let lump		= LumpFactory.createFromName(name);
 
-			lump.load(this.input.slice(position, position + length));
+			lump.content = this.input.slice(position, position + length);
 
-			console.debug(`Read lump ${lump.name} will be at position 0x${position.toString(16)} with length 0x${length.toString(16)}`);
+			// console.debug(`Read lump ${lump.name} will be at position 0x${position.toString(16)} with length 0x${length.toString(16)}`);
 
 			lumps.push(lump);
 		}
 
-		console.debug(`Dictionary offset is 0x${this.dictionaryOffset.toString(16)}`);
+		// console.debug(`Dictionary offset is 0x${this.dictionaryOffset.toString(16)}`);
 
-		console.debug(`Dictionary specifies total lump size is 0x${totalLength.toString(16)}`);
+		// console.debug(`Dictionary specifies total lump size is 0x${totalLength.toString(16)}`);
 
 		this.wad.lumps = lumps;
 
-		console.debug(`Readback length is 0x` + this.wad.lumpsTotalByteLength.toString(16));
+		// console.debug(`Readback length is 0x` + this.wad.lumpsTotalByteLength.toString(16));
 	}
 
 	read(input: ArrayBuffer)

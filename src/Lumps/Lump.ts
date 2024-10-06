@@ -30,13 +30,13 @@ export default class Lump
 		return this._content;
 	}
 
+	set content(value: ArrayBuffer)
+	{
+		this._content = value;
+	}
+
 	get length(): number
 	{
 		return this.content.byteLength; // NB: Add terminator
-	}
-
-	load(buffer: ArrayBuffer)
-	{
-		this._content = buffer;
 	}
 }
